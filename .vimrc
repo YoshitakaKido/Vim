@@ -386,4 +386,4 @@ call neobundle#end()
 " ファイルタイプ別のプラグイン/インデントを有効にする
 filetype plugin indent on
 
-
+NeoBundleCheck
