@@ -369,7 +369,18 @@ call neobundle#begin(expand('~/.vim/bundle/'))
         " call neocomplete#custom#source('look', 'min_pattern_length', 1)
 
         call neobundle#untap()
-endif
+    endif
+
+    if(!empty(neobundle#get_not_installed_bundle_names()))
+        echomsg 'Not installed bundles: '
+        \ string(neobundle#get_not_installed_bundle_names())
+    if confirm('Install bundles now?', "yes\nNo", 2) == 1
+        " vimrc を再度読み込み、インストールした Bundle を有効化
+        " vimrc は必ず再読み込み可能な形式で記述すること
+        NeoBundleInstall
+        source ~/.vimrc
+    endif
+        end
 
 call neobundle#end()
 " ファイルタイプ別のプラグイン/インデントを有効にする
