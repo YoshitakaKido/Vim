@@ -1,4 +1,5 @@
 context_filetype.vim
+ctrlp.vim
 lightline.vim
 neco-gh-issues
 neco-look

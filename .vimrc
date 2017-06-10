@@ -2,6 +2,8 @@ syntax on
 colorscheme wallaby
 set t_Co=256
 
+highlight Normal ctermbg=none
+
 " setting
 "文字コードをUFT-8に設定
 set fenc=utf-8
@@ -71,14 +73,22 @@ set write
 " Latex
 let g:Tex_AutoFolding=0
 
+"Turn off paste mode when leaving insert
+autocmd InsertLeave * set nopaste
 
 if has('vim_starting')
-   " 初回起動時のみruntimepathにneobundleのパスを指定する
-   set runtimepath+=~/.vim/bundle/neobundle.vim/
+    " NeoBundleが未取得の場合、git cloneを呼び出す
+    if !isdirectory(expand("~/.vim/bundle/neobundle.vim/"))
+        echo "install neobundle..."
+        :call system("git clone git://github.com/Shougo/neobundle.vim ~/.vim/bundle/neobundle.vim")
+    endif
+
+    " 初回起動時のみruntimepathにneobundleのパスを指定する
+    set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
 
-" NeoBundleを初期化
-call neobundle#begin(expand('~/.vim/bundle/'))
+    " NeoBundleを初期化
+    call neobundle#begin(expand('~/.vim/bundle/'))
 
     " インストールするプラグインをここに記述
     NeoBundle 'Shougo/unite.vim'
@@ -107,14 +117,10 @@ call neobundle#begin(expand('~/.vim/bundle/'))
         \   "unix"      : "make -f make_unix.mak",
     \ }}
 
-    " call neobundle#end()
     NeoBundle 'Shougo/neocomplcache'
     highlight Pmenu ctermbg=4
     highlight PmenuSel ctermbg=1
     highlight PMenuSbar ctermbg=4
-
-    " 補完ウィンドウの設定
-    set completeopt=menuone
 
     " 補完ウィンドウの設定
     set completeopt=menuone
@@ -157,42 +163,6 @@ call neobundle#begin(expand('~/.vim/bundle/'))
     endif
         let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 
-
-
-
-    " " AutoComplPopを無効にする
-    " let g:acp_enableAtStartup = 0
-    " " neocomplcacheを有効にする
-    " let g:neocomplcache_enable_at_startup = 1
-    " " 入力値に大文字が含まれている場合は、大文字・小文字を無視しない
-    " let g:neocomplcache_enable_smart_case = 1
-    " " Set minimum syntax keyword length.
-    " let g:neocomplcache_min_syntax_length = 3
-    " let g:neocomplcache_lock_buffer_name_pattern = '\*ku\*'
-    "
-    " " Define dictionary.
-    " let g:neocomplcache_dictionary_filetype_lists = {
-    "     \ 'default' : ''
-    "     \ }
-    "
-    " " Plugin key-mappings.
-    " inoremap <expr><C-g>     neocomplcache#undo_completion()
-    " inoremap <expr><C-l>     neocomplcache#complete_common_string()
-    "
-    " " Recommended key-mappings.
-    " " <CR>: close popup and save indent.
-    " inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-    " function! s:my_cr_function()
-    "     return neocomplcache#smart_close_popup() . "\<CR>"
-    " endfunction
-    " " <TAB>: completion.
-    " inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-    " " <C-h>, <BS>: close popup and delete backword char.
-    " inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-    " inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-    " inoremap <expr><C-y>  neocomplcache#close_popup()
-    " inoremap <expr><C-e>  neocomplcache#cancel_popup()
-
     NeoBundle 'Shougo/neosnippet'
     NeoBundle 'Shougo/neosnippet-snippets'
 
@@ -202,9 +172,9 @@ call neobundle#begin(expand('~/.vim/bundle/'))
     " 隠しファイルを表示する
     " let NERDTreeShowHidden = 1
     " 起動時にNERDTreeを表示
-    autocmd vimenter * NERDTree
+    " autocmd vimenter * NERDTree
     " デフォルトでツリーを表示させる
-    let g:nerdtree_tabs_open_on_console_startup=1
+    " let g:nerdtree_tabs_open_on_console_startup=1
     " NERDTress File highlighting
     function! NERDTreeHighlightFile(extension, fg, bg, guifg, guibg)
         exec 'autocmd filetype nerdtree highlight ' . a:extension .' ctermbg='. a:bg .' ctermfg='. a:fg .' guibg='. a:guibg .' guifg='. a:guifg
@@ -328,7 +298,7 @@ call neobundle#begin(expand('~/.vim/bundle/'))
         " ポップアップメニューで表示される候補の数
         let g:neocomplete#max_list = 20
         " シンタックスをキャッシュするときの最小文字長
-        let g:neocomplete#sources#syntax#min_keyword_length = 3
+        let g:neocomplete#sources#syntax#min_keyword_length = 2
         " 補完を表示する最小文字数
         let g:neocomplete#auto_completion_start_length = 2
         " preview window を閉じない
@@ -369,21 +339,14 @@ call neobundle#begin(expand('~/.vim/bundle/'))
         " call neocomplete#custom#source('look', 'min_pattern_length', 1)
 
         call neobundle#untap()
-    endif
+endif
 
-    if(!empty(neobundle#get_not_installed_bundle_names()))
-        echomsg 'Not installed bundles: '
-        \ string(neobundle#get_not_installed_bundle_names())
-    if confirm('Install bundles now?', "yes\nNo", 2) == 1
-        " vimrc を再度読み込み、インストールした Bundle を有効化
-        " vimrc は必ず再読み込み可能な形式で記述すること
-        NeoBundleInstall
-        source ~/.vimrc
-    endif
-        end
+       NeoBundle "ctrlpvim/ctrlp.vim" 
+
+       NeoBundle 'davidhalter/jedi-vim'
 
 call neobundle#end()
 " ファイルタイプ別のプラグイン/インデントを有効にする
 filetype plugin indent on
 
-NeoBundleCheck
+
